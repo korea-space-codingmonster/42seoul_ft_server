@@ -55,15 +55,12 @@ LEMP 스택 + 워드프레스 + SSL, 오토인덱스 옵션이 있는 도커 컨
 
 
 
-즉, 이 서브젝트에 대해 다시 말하면
-도커 기술을 활용하여 웹 서버를 만드는 것입니다. 만든 웹서버는 충족시켜야할 조건이 있는데 다음과 같습니다.
-
-1. 웹서버는 Nginx를 이용해서 설치하며, 하나의 도커 컨테이너만 설치합니다. 이 컨테이너의 os는 데비안 버스터 입니다.
-2.웹 서버는 여러 서비스가 연동되어야 하는데 서비스 목록은 다음과 같습니다. wordpress웹사이트, phpMyAdmin, MySQL
-mysql은 워드프로세스에서 연동하여 사용이 가능하여야 한다.
-3. 우리가 만드는 서버는 SSL프로토콜을 사용할 수 있어야 합니다.
-4. url에 따라서 정확한 웹사이트와 연결될 수 있도록 처리해야합니다.
-5. 언제든 해체할 수 있는 autoindex가 적용되어햐 합니다.
 
 
-위 요구사항을 알아보고 구현해 보자!
+# Docker란 무엇인가?
+
+1. 도커란 무엇인가? [https://github.com/korea-space-codingmonster/42seoul_ft_server/wiki/What-is-Docker]
+2. 도커 설치법 [https://github.com/korea-space-codingmonster/42seoul_ft_server/wiki/Docker-설치] 
+3. 도커 사용법[https://github.com/korea-space-codingmonster/42seoul_ft_server/wiki/도커-사용법]
+4. ft_server를 수행하면서 알아야하는 소프트웨어[https://github.com/korea-space-codingmonster/42seoul_ft_server/wiki/ft_server-관련-소프트웨어-정리]
+  
