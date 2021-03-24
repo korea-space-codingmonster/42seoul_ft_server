@@ -1,3 +1,4 @@
+#이미지 만들기 시작
 FROM debian:buster
 LABEL maintainer="napark <napark.student.42seoul.kr>"
 
@@ -11,37 +12,41 @@ ARG WP_DB_PASSWORD = 42seoul
 EXPOSE 80/tcp 443/tcp
 
 #-y를 넣는 이유 : yes명령어를 써야할 때 스킵하기 위해
-RUN apt-get update -y; apt upgrade -y
+RUN			apt-get update -y; apt upgrade -y
 
 #install dependency
-RUN apt install ngninx php-fpm mariadb-server php-mysql php-mbstring vim curl -y
-
+RUN			apt install ngninx php7.3-fpm mariadb-server php7.3-mysql php-mbstring vim curl -y
 
 #copy to src files
-COPY srcs /
+COPY		./srcs/* ./
 
-RUN openssl genrsa -out ft_server.localhost.key 4096; \
-        openssl req -x509 -nodes -days 365 \
-        -key ft_server.localhost.key \
-        -out ft_server.localhost.crt \
-        -subj "/C=KR/ST=SEOUL/L=Gaepo-dong/O=42Seoul/OU=jaeskim/CN=localhost"; \
-        chmod 644 ft_server.localhost.*; \
-        mv ft_server.localhost.crt /etc/ssl/certs/;	\
-	    mv ft_server.localhost.key /etc/ssl/private/; \
-	    cp /nginx-sites-available-default.conf /etc/nginx/sites-available/default
+RUN		openssl req -newkey rsa:4096 -days 365 -nodes -x509\
+				-subj "/C=KR/ST=SEOUL/L=Gaepo-dong/O=42Seoul/OU=yjung/CN=localhost"\
+				-keyout localhost.dev.key -out localhost.dev.crt; \
+				mv localhost.dev.crt /etc/ssl/certs/;	\
+				mv localhost.dev.key /etc/ssl/private/; \
+				chmod 600 etc/ssl/certs/localhost.dev.crt etc/ssl/private/localhost.dev.key; \
+				cp /default /etc/nginx/sites-available/default
 
-# setup mysqlDB(mariaDB)
-RUN service mysql start; \
-	    mysql -e "CREATE DATABASE ${WP_DB_NAME};\
-	    USE ${WP_DB_NAME}; \
-	    CREATE USER '${WP_DB_USER}'@'localhost' IDENTIFIED BY '${WP_DB_PASSWORD}'; \
-	    GRANT ALL PRIVILEGES ON ${WP_DB_NAME}.* TO '${WP_DB_USER}'@'localhost' WITH GRANT OPTION; \
-	    FLUSH PRIVILEGES;"
+RUN		curl -O https://files.phpmyadmin.net/phpMyAdmin/5.0.4/phpMyAdmin-5.0.4-all-languages.tar.gz
+RUN		tar -xzf phpMyAdmin-5.0.4-all-languages.tar.gz -C /var/www/html/; \
+			mv /var/www/html/phpMyAdmin-5.0.4-all-languages /var/www/html/phpmyadmin; \
+			mv /var/www/html/phpmyadmin/config.sample.inc.php /var/www/html/phpmyadmin/config.inc.php
 
-# chage directory owner
-RUN chown -R www-data:www-data /var/www/html/
+RUN		service mysql start; \
+			mysql -e "CREATE DATABASE ${WP_DB_NAME};\
+			USE ${WP_DB_NAME}; \
+			CREATE USER '${WP_DB_USER}'@'localhost' IDENTIFIED BY '${WP_DB_PASSWORD}'; \
+			GRANT ALL PRIVILEGES ON ${WP_DB_NAME}.* TO '${WP_DB_USER}'@'localhost' WITH GRANT OPTION; \
+			FLUSH PRIVILEGES;" 
 
-# setup nginx running forground
-# RUN echo "\ndaemon off;" >> /etc/nginx/nginx.conf
+#setup wordpress
+RUN		tar	-xzf wordpress.tar.gz -C /var/www/html/; \
+			mv /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php; \
+			sed -i "s/database_name_here/${WP_DB_NAME}/g" /var/www/html/wordpress/wp-config.php; \
+			sed -i "s/username_here/${WP_DB_USER}/g" /var/www/html/wordpress/wp-config.php; \
+			sed -i "s/password_here/${WP_DB_PASSWORD}/g" /var/www/html/wordpress/wp-config.php
 
-ENTRYPOINT ["/bin/bash", "-C", "/server.sh"]
+RUN 		chown -R www-data:www-data /var/www/html/
+
+ENTRYPOINT ["/bin/bash", "-C", "/run.sh"]

@@ -1,0 +1,36 @@
+# /etc/nginx/sites-available/default
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+
+	return 301 https://$host$request_uri;
+}
+
+server {
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
+
+	server_name _;
+
+	ssl_certificate /etc/ssl/certs/localhost.dev.crt;
+	ssl_certificate_key /etc/ssl/private/localhost.dev.key;
+
+	root /var/www/html;
+
+	autoindex off;
+    #autoindex 역할이 디렉터리로 접근했을 때 디렉터리 내부의 파일을 보여줄지 안보여줄기,
+    # 403 : 볼 권한이 없을 때
+	index index.html index.htm index.php;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404
+		try_files $uri $uri/ =404;
+	}
+
+	location ~ \.php$ {
+		include snippets/fastcgi-php.conf;
+		# With php-fpm (or other unix sockers)
+		fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+	}
+}
