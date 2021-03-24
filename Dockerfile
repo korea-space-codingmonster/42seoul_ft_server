@@ -4,9 +4,9 @@ LABEL maintainer="napark <napark.student.42seoul.kr>"
 
 #init arg
 #변수값
-ARG WP_DB_NAME = wordpress
-ARG WP_DB_USER = napark
-ARG WP_DB_PASSWORD = 42seoul
+ARG WP_DB_NAME=wordpress
+ARG WP_DB_USER=napark
+ARG WP_DB_PASSWORD=42seoul
 
 #docker 이미지 포트를 정할 때 쓰는 명령어
 EXPOSE 80/tcp 443/tcp
@@ -15,7 +15,7 @@ EXPOSE 80/tcp 443/tcp
 RUN			apt-get update -y; apt upgrade -y
 
 #install dependency
-RUN			apt install ngninx php7.3-fpm mariadb-server php7.3-mysql php-mbstring vim curl -y
+RUN			apt install nginx php-fpm mariadb-server php-mysql php-mbstring vim curl -y
 
 #copy to src files
 COPY		./srcs/* ./
